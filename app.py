@@ -6,9 +6,9 @@ import pandas as pd
 from datetime import datetime
 
 
-# ============================================================
-# PAGE
-# ============================================================
+# =========================================================
+# PAGE SETTINGS
+# =========================================================
 
 st.set_page_config(
     page_title="Smart Belt Monitoring",
@@ -18,263 +18,224 @@ st.set_page_config(
 )
 
 
-# ============================================================
-# CSS
-# ============================================================
-
-st.markdown("""
-<style>
-
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-header {
-    visibility: hidden;
-}
-
-.stApp {
-    background-color: #07101e;
-    color: white;
-}
-
-.block-container {
-    padding-top: 1.2rem;
-    padding-bottom: 2rem;
-    max-width: 1550px;
-}
-
-
-/* SIDEBAR */
-
-section[data-testid="stSidebar"] {
-    background-color: #0c1525;
-    border-right: 1px solid #1d2a40;
-}
-
-section[data-testid="stSidebar"] h1,
-section[data-testid="stSidebar"] h2,
-section[data-testid="stSidebar"] h3 {
-    color: white;
-}
-
-
-/* HEADER */
-
-.header-box {
-    background: #0c1627;
-    border: 1px solid #1e2c43;
-    border-radius: 10px;
-    padding: 18px 25px;
-    margin-bottom: 18px;
-}
-
-.header-title {
-    font-size: 27px;
-    font-weight: 700;
-    color: white;
-}
-
-.header-subtitle {
-    color: #91a0b5;
-    font-size: 14px;
-    margin-top: 4px;
-}
-
-.online {
-    color: #31dc82;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-
-/* CARDS */
-
-.card {
-    background: #0d1829;
-    border: 1px solid #1e2d45;
-    border-radius: 10px;
-    padding: 17px;
-    min-height: 100%;
-}
-
-.card-title {
-    color: #dbe7f7;
-    font-size: 18px;
-    font-weight: 650;
-    margin-bottom: 12px;
-}
-
-
-/* LIVE FEED */
-
-.feed-empty {
-    height: 285px;
-    border-radius: 8px;
-    border: 1px solid #263752;
-    background: #091321;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #718096;
-    font-size: 16px;
-}
-
-
-/* STATUS */
-
-.normal {
-    color: #42e58b;
-    font-size: 27px;
-    font-weight: 700;
-}
-
-.warning {
-    color: #ffb83d;
-    font-size: 27px;
-    font-weight: 700;
-}
-
-.critical {
-    color: #ff5757;
-    font-size: 27px;
-    font-weight: 700;
-}
-
-
-/* METRICS */
-
-.metric {
-    background: #091321;
-    border: 1px solid #273852;
-    border-radius: 9px;
-    padding: 12px;
-    min-height: 72px;
-}
-
-.metric-label {
-    color: #91a0b5;
-    font-size: 12px;
-}
-
-.metric-number {
-    color: white;
-    font-size: 23px;
-    font-weight: 700;
-    margin-top: 4px;
-}
-
-
-/* ALERT */
-
-.alert {
-    background: #251923;
-    border: 1px solid #5b3040;
-    border-radius: 9px;
-    padding: 12px;
-    margin-bottom: 9px;
-}
-
-.alert-title {
-    color: #ff6464;
-    font-weight: 650;
-}
-
-.alert-time {
-    color: #8794a8;
-    font-size: 12px;
-}
-
-
-/* PHONE */
-
-.phone {
-    background: #091321;
-    border: 1px solid #253650;
-    border-radius: 10px;
-    padding: 18px;
-    text-align: center;
-    min-height: 170px;
-}
-
-.phone-icon {
-    font-size: 50px;
-}
-
-.phone-message {
-    background: #202c40;
-    border-radius: 9px;
-    padding: 10px;
-    text-align: left;
-    margin-top: 10px;
-}
-
-.phone-title {
-    color: #ff5b5b;
-    font-weight: 700;
-}
-
-
-/* INFO */
-
-.info {
-    color: #8190a5;
-    font-size: 13px;
-}
-
-
-/* SECTION */
-
-.section-title {
-    color: white;
-    font-size: 21px;
-    font-weight: 700;
-    margin-top: 18px;
-    margin-bottom: 10px;
-}
-
-
-/* STREAMLIT BUTTON */
-
-.stButton > button {
-    border-radius: 7px;
-    font-weight: 650;
-}
-
-
-/* FILE UPLOADER */
-
-[data-testid="stFileUploader"] {
-    background: #0a1423;
-    border-radius: 8px;
-}
-
-
-/* NUMBER INPUT */
-
-div[data-testid="stNumberInput"] input {
-    background: #091321;
-    color: white;
-}
-
-
-/* DATAFRAME */
-
-[data-testid="stDataFrame"] {
-    border-radius: 8px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-# ============================================================
-# LOAD MODEL
-# ============================================================
+# =========================================================
+# CUSTOM STYLE
+# =========================================================
+
+st.markdown(
+    """
+    <style>
+
+    /* Main page */
+    .stApp {
+        background-color: #07101e;
+        color: white;
+    }
+
+    .block-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        max-width: 1600px;
+    }
+
+    /* Hide Streamlit default elements */
+    #MainMenu {
+        visibility: hidden;
+    }
+
+    footer {
+        visibility: hidden;
+    }
+
+    header {
+        visibility: hidden;
+    }
+
+    /* Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #0b1424;
+        border-right: 1px solid #1d2b40;
+    }
+
+    /* Header */
+    .top-header {
+        background-color: #0c1627;
+        border: 1px solid #1d2c43;
+        border-radius: 10px;
+        padding: 18px 24px;
+        margin-bottom: 16px;
+    }
+
+    .main-title {
+        font-size: 27px;
+        font-weight: 700;
+        color: white;
+    }
+
+    .sub-title {
+        color: #91a0b5;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .online-text {
+        color: #36df82;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .date-text {
+        color: #8b99ad;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    /* Cards */
+    .dashboard-card {
+        background-color: #0d1829;
+        border: 1px solid #1f3048;
+        border-radius: 10px;
+        padding: 16px;
+        min-height: 100%;
+    }
+
+    .card-heading {
+        color: #dce7f6;
+        font-size: 18px;
+        font-weight: 650;
+        margin-bottom: 12px;
+    }
+
+    /* Empty live feed */
+    .empty-feed {
+        height: 270px;
+        background-color: #091321;
+        border: 1px solid #263650;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #718096;
+        font-size: 16px;
+    }
+
+    /* Status */
+    .status-normal {
+        color: #42e58b;
+        font-size: 27px;
+        font-weight: 700;
+    }
+
+    .status-warning {
+        color: #ffb83d;
+        font-size: 27px;
+        font-weight: 700;
+    }
+
+    .status-critical {
+        color: #ff5757;
+        font-size: 27px;
+        font-weight: 700;
+    }
+
+    /* Metric */
+    .metric-box {
+        background-color: #091321;
+        border: 1px solid #263650;
+        border-radius: 8px;
+        padding: 12px;
+        min-height: 70px;
+    }
+
+    .metric-label {
+        color: #8e9db1;
+        font-size: 12px;
+    }
+
+    .metric-value {
+        color: white;
+        font-size: 23px;
+        font-weight: 700;
+        margin-top: 4px;
+    }
+
+    /* Alerts */
+    .alert-box {
+        background-color: #251923;
+        border: 1px solid #603140;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    .alert-title {
+        color: #ff6262;
+        font-weight: 650;
+        font-size: 14px;
+    }
+
+    .alert-time {
+        color: #8491a5;
+        font-size: 11px;
+        margin-top: 4px;
+    }
+
+    /* Phone */
+    .phone-box {
+        background-color: #091321;
+        border: 1px solid #263650;
+        border-radius: 9px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .phone-icon {
+        font-size: 45px;
+    }
+
+    .phone-alert {
+        background-color: #202b40;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: left;
+        margin-top: 10px;
+    }
+
+    .phone-alert-title {
+        color: #ff5c5c;
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .small-text {
+        color: #8391a5;
+        font-size: 12px;
+    }
+
+    /* Section title */
+    .section-title {
+        color: white;
+        font-size: 21px;
+        font-weight: 700;
+        margin-top: 18px;
+        margin-bottom: 10px;
+    }
+
+    /* Buttons */
+    .stButton > button {
+        border-radius: 7px;
+        font-weight: 650;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# =========================================================
+# LOAD YOLO MODEL
+# =========================================================
 
 @st.cache_resource
 def load_model():
@@ -283,16 +244,16 @@ def load_model():
 
 try:
     model = load_model()
-    model_ok = True
-except Exception as e:
-    model_ok = False
+    model_loaded = True
+except Exception as error:
+    model_loaded = False
     st.error("Could not load best.pt")
-    st.code(str(e))
+    st.code(str(error))
 
 
-# ============================================================
-# SESSION STATE
-# ============================================================
+# =========================================================
+# SESSION VARIABLES
+# =========================================================
 
 if "history" not in st.session_state:
     st.session_state.history = []
@@ -304,9 +265,9 @@ if "latest" not in st.session_state:
     st.session_state.latest = None
 
 
-# ============================================================
+# =========================================================
 # SIDEBAR
-# ============================================================
+# =========================================================
 
 with st.sidebar:
 
@@ -350,15 +311,17 @@ with st.sidebar:
     st.caption("v2.0")
 
 
-# ============================================================
-# HEADER
-# ============================================================
+# =========================================================
+# TOP HEADER
+# =========================================================
 
-current_time = datetime.now().strftime("%b %d, %Y %I:%M %p")
+current_time = datetime.now().strftime(
+    "%b %d, %Y %I:%M %p"
+)
 
 st.markdown(
     f"""
-    <div class="header-box">
+    <div class="top-header">
 
         <div style="display:flex;
                     justify-content:space-between;
@@ -366,11 +329,11 @@ st.markdown(
 
             <div>
 
-                <div class="header-title">
+                <div class="main-title">
                     🏭 SMART BELT MONITORING SYSTEM
                 </div>
 
-                <div class="header-subtitle">
+                <div class="sub-title">
                     Intelligent monitoring of conveyor belt damage
                 </div>
 
@@ -378,11 +341,11 @@ st.markdown(
 
             <div style="text-align:right;">
 
-                <div class="online">
+                <div class="online-text">
                     🟢 System Online
                 </div>
 
-                <div class="info">
+                <div class="date-text">
                     {current_time}
                 </div>
 
@@ -396,32 +359,32 @@ st.markdown(
 )
 
 
-# ============================================================
-# THREE MAIN COLUMNS
-# ============================================================
+# =========================================================
+# MAIN THREE-COLUMN DASHBOARD
+# =========================================================
 
-left, middle, right = st.columns(
-    [5.2, 3.0, 2.2],
+left_col, middle_col, right_col = st.columns(
+    [5, 3, 2.2],
     gap="medium"
 )
 
 
-# ============================================================
-# LEFT COLUMN - LIVE FEED
-# ============================================================
+# =========================================================
+# LEFT: LIVE FEED
+# =========================================================
 
-with left:
+with left_col:
 
     st.markdown(
         """
-        <div class="card">
+        <div class="dashboard-card">
 
-        <div class="card-title">
-            📹 Live Feed
-            <span style="float:right;color:#35df82;">
-                ● Live
-            </span>
-        </div>
+            <div class="card-heading">
+                📹 Live Feed
+                <span style="float:right;color:#36df82;">
+                    ● Live
+                </span>
+            </div>
 
         """,
         unsafe_allow_html=True
@@ -437,7 +400,7 @@ with left:
 
         st.markdown(
             """
-            <div class="feed-empty">
+            <div class="empty-feed">
                 📷 Upload a conveyor belt image
             </div>
             """,
@@ -446,68 +409,75 @@ with left:
 
     else:
 
-        input_image = Image.open(
+        original_image = Image.open(
             uploaded_file
         ).convert("RGB")
 
         st.image(
-            input_image,
+            original_image,
             use_container_width=True
         )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        "</div>",
+        unsafe_allow_html=True
+    )
 
-    analyze = st.button(
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    analyze_button = st.button(
         "🔍 ANALYZE BELT",
         type="primary",
         use_container_width=True
     )
 
 
-# ============================================================
-# ANALYSIS
-# ============================================================
+# =========================================================
+# RUN AI ANALYSIS
+# =========================================================
 
-if analyze:
+if analyze_button:
 
     if uploaded_file is None:
 
         st.warning(
-            "Please upload a conveyor belt image first."
+            "Please upload a conveyor belt image."
         )
 
-    elif not model_ok:
+    elif not model_loaded:
 
         st.error(
-            "AI model could not be loaded."
+            "The AI model could not be loaded."
         )
 
     else:
 
-        input_image = Image.open(
+        original_image = Image.open(
             uploaded_file
         ).convert("RGB")
 
-        image_array = np.array(input_image)
+        image_array = np.array(
+            original_image
+        )
 
-        results = model.predict(
+        predictions = model.predict(
             source=image_array,
             conf=0.25,
             imgsz=640,
             verbose=False
         )
 
-        result = results[0]
+        result = predictions[0]
 
         crack_count = 0
         tear_count = 0
-        max_confidence = 0
+        confidence = 0.0
 
         if result.boxes is not None:
 
-            for cls in result.boxes.cls:
+            for class_value in result.boxes.cls:
 
-                class_id = int(cls)
+                class_id = int(class_value)
 
                 if class_id == 0:
                     crack_count += 1
@@ -517,133 +487,154 @@ if analyze:
 
             if len(result.boxes) > 0:
 
-                max_confidence = float(
+                confidence = float(
                     result.boxes.conf.max()
                 )
 
-        # ====================================================
-        # RISK
-        # ====================================================
+        # =================================================
+        # RISK SCORE
+        # =================================================
 
-        risk = 0
+        risk_score = 0
 
         if crack_count > 0:
-            risk += 35
+            risk_score += 35
 
         if tear_count > 0:
-            risk += 35
+            risk_score += 35
 
         if vibration > 7:
-            risk += 20
+            risk_score += 20
 
         elif vibration > 5:
-            risk += 10
+            risk_score += 10
 
         if temperature > 70:
-            risk += 20
+            risk_score += 20
 
         elif temperature > 60:
-            risk += 10
+            risk_score += 10
 
-        risk = min(risk, 100)
+        risk_score = min(
+            risk_score,
+            100
+        )
 
-        if risk >= 70:
-            status = "CRITICAL"
+        # =================================================
+        # STATUS
+        # =================================================
 
-        elif risk >= 40:
-            status = "WARNING"
+        if risk_score >= 70:
+
+            belt_status = "CRITICAL"
+
+        elif risk_score >= 40:
+
+            belt_status = "WARNING"
 
         else:
-            status = "NORMAL"
 
-        damage = []
+            belt_status = "NORMAL"
+
+        # =================================================
+        # DAMAGE NAME
+        # =================================================
+
+        detected_damage = []
 
         if crack_count > 0:
-            damage.append("Crack")
+            detected_damage.append("Crack")
 
         if tear_count > 0:
-            damage.append("Tear")
+            detected_damage.append("Tear")
 
-        if damage:
-            damage_text = ", ".join(damage)
+        if detected_damage:
+
+            damage_text = ", ".join(
+                detected_damage
+            )
+
         else:
+
             damage_text = "No visible damage"
 
-        # ====================================================
-        # SAVE HISTORY
-        # ====================================================
+        # =================================================
+        # SAVE INSPECTION
+        # =================================================
 
-        time_now = datetime.now().strftime(
+        inspection_time = datetime.now().strftime(
             "%b %d, %I:%M %p"
         )
 
-        history_item = {
-            "Time": time_now,
+        inspection = {
+            "Time": inspection_time,
             "Damage": damage_text,
             "Crack": crack_count,
             "Tear": tear_count,
             "Vibration": vibration,
             "Temperature": temperature,
-            "Risk": risk,
-            "Status": status,
-            "Image": input_image
+            "Risk": risk_score,
+            "Status": belt_status,
+            "Confidence": confidence,
+            "Image": original_image
         }
 
         st.session_state.history.append(
-            history_item
+            inspection
         )
 
-        st.session_state.latest = history_item
+        st.session_state.latest = inspection
 
-        if status != "NORMAL":
+        # =================================================
+        # SAVE ALERT
+        # =================================================
+
+        if belt_status != "NORMAL":
+
+            alert = {
+                "Time": inspection_time,
+                "Damage": damage_text,
+                "Risk": risk_score
+            }
 
             st.session_state.alerts.insert(
                 0,
-                {
-                    "Time": time_now,
-                    "Damage": damage_text,
-                    "Risk": risk
-                }
+                alert
             )
 
-        # ====================================================
-        # RESULT IMAGE
-        # ====================================================
 
-        annotated = result.plot()
-
-        annotated = annotated[:, :, ::-1]
-
-        st.session_state.latest["Annotated"] = annotated
-
-
-# ============================================================
-# SHOW RESULT / STATUS / ALERTS
-# ============================================================
+# =========================================================
+# GET LATEST RESULT
+# =========================================================
 
 latest = st.session_state.latest
 
 
-# ============================================================
-# MIDDLE - STATUS
-# ============================================================
+# =========================================================
+# MIDDLE: BELT STATUS
+# =========================================================
 
-with middle:
-
-    st.markdown(
-        '<div class="card">',
-        unsafe_allow_html=True
-    )
+with middle_col:
 
     st.markdown(
-        '<div class="card-title">🛡️ Belt Status</div>',
+        """
+        <div class="dashboard-card">
+
+            <div class="card-heading">
+                🛡️ Belt Status
+            </div>
+        """,
         unsafe_allow_html=True
     )
 
     if latest is None:
 
         st.markdown(
-            '<div class="normal">🟢 NORMAL</div>',
+            """
+            <div class="status-normal">
+                🟢 NORMAL
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
@@ -651,60 +642,79 @@ with middle:
             "No inspection performed yet."
         )
 
-        crack = 0
-        tear = 0
-        risk = 0
+        crack_value = 0
+        tear_value = 0
+        risk_value = 0
 
     else:
 
         if latest["Status"] == "CRITICAL":
 
             st.markdown(
-                '<div class="critical">🔴 CRITICAL</div>',
+                """
+                <div class="status-critical">
+                    🔴 CRITICAL
+                </div>
+                """,
                 unsafe_allow_html=True
+            )
+
+            st.write(
+                "Major belt damage detected."
             )
 
         elif latest["Status"] == "WARNING":
 
             st.markdown(
-                '<div class="warning">🟠 WARNING</div>',
+                """
+                <div class="status-warning">
+                    🟠 WARNING
+                </div>
+                """,
                 unsafe_allow_html=True
+            )
+
+            st.write(
+                "Potential belt deterioration detected."
             )
 
         else:
 
             st.markdown(
-                '<div class="normal">🟢 NORMAL</div>',
+                """
+                <div class="status-normal">
+                    🟢 NORMAL
+                </div>
+                """,
                 unsafe_allow_html=True
             )
 
-        st.write(
-            "Major damage detected."
-            if latest["Status"] != "NORMAL"
-            else
-            "No major damage detected."
-        )
+            st.write(
+                "No major damage detected."
+            )
 
-        crack = latest["Crack"]
-        tear = latest["Tear"]
-        risk = latest["Risk"]
+        crack_value = latest["Crack"]
+        tear_value = latest["Tear"]
+        risk_value = latest["Risk"]
 
     st.divider()
 
-    c1, c2 = st.columns(2)
+    # Crack and Tear
 
-    with c1:
+    metric1, metric2 = st.columns(2)
+
+    with metric1:
 
         st.markdown(
             f"""
-            <div class="metric">
+            <div class="metric-box">
 
                 <div class="metric-label">
                     🔴 Crack
                 </div>
 
-                <div class="metric-number">
-                    {crack}
+                <div class="metric-value">
+                    {crack_value}
                 </div>
 
             </div>
@@ -712,18 +722,18 @@ with middle:
             unsafe_allow_html=True
         )
 
-    with c2:
+    with metric2:
 
         st.markdown(
             f"""
-            <div class="metric">
+            <div class="metric-box">
 
                 <div class="metric-label">
                     🔵 Tear
                 </div>
 
-                <div class="metric-number">
-                    {tear}
+                <div class="metric-value">
+                    {tear_value}
                 </div>
 
             </div>
@@ -733,19 +743,21 @@ with middle:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    c3, c4 = st.columns(2)
+    # Placeholder categories
 
-    with c3:
+    metric3, metric4 = st.columns(2)
+
+    with metric3:
 
         st.markdown(
             """
-            <div class="metric">
+            <div class="metric-box">
 
                 <div class="metric-label">
                     🟣 Belt Joint
                 </div>
 
-                <div class="metric-number">
+                <div class="metric-value">
                     0
                 </div>
 
@@ -754,17 +766,17 @@ with middle:
             unsafe_allow_html=True
         )
 
-    with c4:
+    with metric4:
 
         st.markdown(
             """
-            <div class="metric">
+            <div class="metric-box">
 
                 <div class="metric-label">
                     🟡 Other Damage
                 </div>
 
-                <div class="metric-number">
+                <div class="metric-value">
                     0
                 </div>
 
@@ -777,14 +789,14 @@ with middle:
 
     st.markdown(
         f"""
-        <div class="metric">
+        <div class="metric-box">
 
             <div class="metric-label">
                 ⚠️ Risk Score
             </div>
 
-            <div class="metric-number">
-                {risk}%
+            <div class="metric-value">
+                {risk_value}%
             </div>
 
         </div>
@@ -796,50 +808,43 @@ with middle:
         """
         <br>
 
-        <div class="info">
+        <div class="small-text">
             🛡️ Monitoring system running 24/7
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-# ============================================================
-# RIGHT - ALERTS
-# ============================================================
-
-with right:
-
     st.markdown(
-        '<div class="card">',
+        "</div>",
         unsafe_allow_html=True
     )
 
+
+# =========================================================
+# RIGHT: ALERTS
+# =========================================================
+
+with right_col:
+
     st.markdown(
-        '<div class="card-title">🔔 Alerts & Notifications</div>',
+        """
+        <div class="dashboard-card">
+
+            <div class="card-heading">
+                🔔 Alerts & Notifications
+            </div>
+        """,
         unsafe_allow_html=True
     )
 
     if st.session_state.alerts:
 
-        st.markdown(
-            f"""
-            <div style="color:#ff6565;
-                        font-size:12px;
-                        text-align:right;">
-                ● {len(st.session_state.alerts)} new
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
         for alert in st.session_state.alerts[:3]:
 
             st.markdown(
                 f"""
-                <div class="alert">
+                <div class="alert-box">
 
                     <div class="alert-title">
                         🔴 {alert["Damage"]} Detected
@@ -858,18 +863,18 @@ with right:
 
         st.markdown(
             """
-            <div class="normal">
+            <div class="status-normal">
                 🟢
             </div>
 
             <div style="
-                font-size:16px;
+                font-size:15px;
                 font-weight:600;
                 margin-top:5px;">
                 No new alerts
             </div>
 
-            <div class="info">
+            <div class="small-text">
                 System is monitoring the conveyor belt.
             </div>
             """,
@@ -880,30 +885,30 @@ with right:
 
     st.markdown(
         """
-        <div class="card-title">
+        <div class="card-heading">
             📱 Phone Notification
         </div>
 
-        <div class="info">
+        <div class="small-text">
             Get instant alerts on your phone
             for detected damage.
         </div>
 
         <br>
 
-        <div class="phone">
+        <div class="phone-box">
 
             <div class="phone-icon">
                 📱
             </div>
 
-            <div class="phone-message">
+            <div class="phone-alert">
 
-                <div class="phone-title">
+                <div class="phone-alert-title">
                     🔴 Belt Damage Alert
                 </div>
 
-                <div class="info">
+                <div class="small-text">
                     Real-time notification
                 </div>
 
@@ -914,24 +919,27 @@ with right:
         unsafe_allow_html=True
     )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown(
+        "</div>",
+        unsafe_allow_html=True
+    )
 
 
-# ============================================================
-# INSPECTION LOG + TREND
-# ============================================================
+# =========================================================
+# LOWER SECTION
+# =========================================================
 
-log_col, trend_col = st.columns(
-    [1.05, 0.95],
+log_column, trend_column = st.columns(
+    [1.1, 0.9],
     gap="medium"
 )
 
 
-# ============================================================
+# =========================================================
 # INSPECTION LOG
-# ============================================================
+# =========================================================
 
-with log_col:
+with log_column:
 
     st.markdown(
         '<div class="section-title">🕒 Inspection Log</div>',
@@ -951,21 +959,24 @@ with log_col:
             st.session_state.history[-5:]
         ):
 
-            c1, c2, c3 = st.columns(
-                [1.2, 1.2, 1.3]
+            log1, log2, log3 = st.columns(
+                [1.2, 1.0, 1.5]
             )
 
-            with c1:
-                st.write(item["Time"])
+            with log1:
 
-            with c2:
+                st.write(
+                    item["Time"]
+                )
+
+            with log2:
 
                 st.image(
                     item["Image"],
                     width=80
                 )
 
-            with c3:
+            with log3:
 
                 st.write(
                     f"**{item['Damage']}**"
@@ -974,23 +985,21 @@ with log_col:
                 if item["Status"] == "NORMAL":
 
                     st.success(
-                        "Normal",
-                        icon="🟢"
+                        "Normal"
                     )
 
                 else:
 
                     st.error(
-                        "Alert",
-                        icon="⚠️"
+                        "⚠ Alert"
                     )
 
 
-# ============================================================
+# =========================================================
 # DAMAGE TREND
-# ============================================================
+# =========================================================
 
-with trend_col:
+with trend_column:
 
     st.markdown(
         '<div class="section-title">📈 Damage Trend</div>',
@@ -1006,64 +1015,71 @@ with trend_col:
 
     else:
 
-        chart_data = pd.DataFrame(
-            [
+        chart_rows = []
+
+        for number, item in enumerate(
+            st.session_state.history,
+            start=1
+        ):
+
+            chart_rows.append(
                 {
-                    "Inspection": i + 1,
+                    "Inspection": number,
                     "Crack": item["Crack"],
                     "Tear": item["Tear"]
                 }
-                for i, item
-                in enumerate(st.session_state.history)
-            ]
+            )
+
+        chart_df = pd.DataFrame(
+            chart_rows
         )
 
-        chart_data = chart_data.set_index(
+        chart_df = chart_df.set_index(
             "Inspection"
         )
 
         st.line_chart(
-            chart_data,
+            chart_df,
             use_container_width=True
         )
 
 
-# ============================================================
-# SENSOR SNAPSHOT
-# ============================================================
+# =========================================================
+# CURRENT SENSOR SNAPSHOT
+# =========================================================
 
 st.markdown(
     '<div class="section-title">📊 Current Sensor Snapshot</div>',
     unsafe_allow_html=True
 )
 
-s1, s2, s3 = st.columns(3)
+sensor1, sensor2, sensor3 = st.columns(3)
 
-with s1:
+with sensor1:
 
     st.metric(
         "📳 Vibration",
         f"{vibration:.2f} mm/s"
     )
 
-with s2:
+with sensor2:
 
     st.metric(
         "🌡️ Temperature",
         f"{temperature:.1f} °C"
     )
 
-with s3:
+with sensor3:
 
     st.metric(
         "⚠️ Risk Score",
-        f"{risk}%"
+        f"{risk_value}%"
     )
 
 
-# ============================================================
+# =========================================================
 # FOOTER
-# ============================================================
+# =========================================================
 
 st.markdown(
     """
@@ -1071,8 +1087,8 @@ st.markdown(
         text-align:center;
         color:#64748b;
         font-size:12px;
-        padding:20px;
-        margin-top:20px;
+        padding:18px;
+        margin-top:18px;
         border-top:1px solid #1c293d;">
 
         🏭 Smart Belt Monitoring System
