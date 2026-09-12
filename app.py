@@ -14,15 +14,9 @@ import os
 st.set_page_config(
     page_title="Smart Belt Monitoring",
     page_icon="🏭",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
-
-
-# =========================================================
-# LOAD AI MODEL
-# =========================================================
-
-model = YOLO("best.pt")
 
 
 # =========================================================
@@ -32,77 +26,210 @@ model = YOLO("best.pt")
 st.markdown("""
 <style>
 
-.main-title {
-    font-size: 38px;
-    font-weight: 700;
-    text-align: center;
-}
+    /* Main background */
+    .stApp {
+        background-color: #0b1220;
+        color: white;
+    }
 
-.subtitle {
-    text-align: center;
-    color: #777;
-    margin-bottom: 20px;
-}
+    /* Remove some default spacing */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
 
-.status-monitoring {
-    background-color: #dff5e1;
-    color: #16802b;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-}
+    /* Main title */
+    .main-title {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 0px;
+    }
 
-.risk-low {
-    background-color: #dff5e1;
-    color: #16802b;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-}
+    .subtitle {
+        color: #9ca3af;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
 
-.risk-medium {
-    background-color: #fff1c7;
-    color: #946200;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-}
+    /* Cards */
+    .card {
+        background-color: #111827;
+        border: 1px solid #263244;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 15px;
+    }
 
-.risk-high {
-    background-color: #ffd9d9;
-    color: #b00020;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-}
+    /* Status */
+    .system-status {
+        background-color: #12351f;
+        border-radius: 10px;
+        padding: 12px;
+        text-align: center;
+        color: #4ade80;
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    /* Metric boxes */
+    .metric-box {
+        background-color: #111827;
+        border: 1px solid #263244;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+    }
+
+    .metric-title {
+        color: #9ca3af;
+        font-size: 14px;
+    }
+
+    .metric-value {
+        font-size: 25px;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+
+    /* Risk */
+    .risk-low {
+        background-color: #12351f;
+        color: #4ade80;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .risk-medium {
+        background-color: #3b2f0b;
+        color: #facc15;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .risk-high {
+        background-color: #3b1515;
+        color: #f87171;
+        padding: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    /* Alert */
+    .alert-box {
+        background-color: #321619;
+        border: 1px solid #7f1d1d;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .normal-box {
+        background-color: #12351f;
+        border-radius: 10px;
+        padding: 14px;
+        color: #4ade80;
+    }
+
+    /* Small text */
+    .small-text {
+        color: #9ca3af;
+        font-size: 13px;
+    }
 
 </style>
 """, unsafe_allow_html=True)
 
 
 # =========================================================
-# TITLE
+# LOAD MODEL
 # =========================================================
 
-st.markdown(
-    '<div class="main-title">🏭 SMART BELT MONITORING SYSTEM</div>',
-    unsafe_allow_html=True
-)
+MODEL_PATH = "best.pt"
 
-st.markdown(
-    '<div class="subtitle">'
-    'Intelligent monitoring of conveyor belt damage'
-    '</div>',
-    unsafe_allow_html=True
-)
+if not os.path.exists(MODEL_PATH):
+    st.error("❌ best.pt model file not found.")
+    st.stop()
+
+model = YOLO(MODEL_PATH)
+
+
+# =========================================================
+# SESSION HISTORY
+# =========================================================
+
+if "inspection_history" not in st.session_state:
+    st.session_state.inspection_history = []
+
+
+# =========================================================
+# SIDEBAR
+# =========================================================
+
+with st.sidebar:
+
+    st.markdown("## ⚙️ Monitoring Controls")
+
+    vibration = st.number_input(
+        "📳 Vibration (mm/s)",
+        min_value=0.0,
+        max_value=20.0,
+        value=5.2,
+        step=0.1
+    )
+
+    temperature = st.number_input(
+        "🌡️ Temperature (°C)",
+        min_value=0.0,
+        max_value=150.0,
+        value=40.0,
+        step=0.5
+    )
+
+    st.markdown("---")
+
+    st.markdown(
+        '<div class="small-text">'
+        'Monitoring thresholds are used internally for prototype risk assessment.'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+
+# =========================================================
+# HEADER
+# =========================================================
+
+header_col1, header_col2 = st.columns([5, 1])
+
+with header_col1:
+
+    st.markdown(
+        '<div class="main-title">🏭 SMART BELT MONITORING SYSTEM</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<div class="subtitle">'
+        'Intelligent monitoring of conveyor belt damage'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+with header_col2:
+
+    st.markdown(
+        '<div style="text-align:right; color:#4ade80; '
+        'font-weight:600; margin-top:15px;">'
+        '🟢 SYSTEM ONLINE'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
 
 # =========================================================
@@ -110,39 +237,10 @@ st.markdown(
 # =========================================================
 
 st.markdown(
-    '<div class="status-monitoring">'
+    '<div class="system-status">'
     '🟢 SYSTEM STATUS: MONITORING'
     '</div>',
     unsafe_allow_html=True
-)
-
-st.write("")
-
-
-# =========================================================
-# SIDEBAR
-# =========================================================
-
-st.sidebar.header("⚙️ Monitoring Controls")
-
-vibration = st.sidebar.number_input(
-    "📳 Vibration (mm/s)",
-    min_value=0.0,
-    value=5.0,
-    step=0.1
-)
-
-temperature = st.sidebar.number_input(
-    "🌡️ Temperature (°C)",
-    min_value=0.0,
-    value=40.0,
-    step=0.1
-)
-
-st.sidebar.info(
-    "Prototype thresholds:\n\n"
-    "Vibration > 7 mm/s\n\n"
-    "Temperature > 70 °C"
 )
 
 
@@ -150,7 +248,7 @@ st.sidebar.info(
 # IMAGE UPLOAD
 # =========================================================
 
-image = st.file_uploader(
+uploaded_file = st.file_uploader(
     "📷 Upload Conveyor Belt Image",
     type=["jpg", "jpeg", "png"]
 )
@@ -173,26 +271,22 @@ analyze = st.button(
 
 if analyze:
 
-    if image is None:
+    if uploaded_file is None:
 
-        st.warning(
-            "Please upload a conveyor belt image."
-        )
+        st.warning("Please upload a conveyor belt image first.")
 
     else:
 
-        # -------------------------------------------------
-        # READ IMAGE
-        # -------------------------------------------------
+        # -----------------------------------------------
+        # Read image
+        # -----------------------------------------------
 
-        input_image = Image.open(image).convert("RGB")
+        image = Image.open(uploaded_file).convert("RGB")
+        image_array = np.array(image)
 
-        image_array = np.array(input_image)
-
-
-        # -------------------------------------------------
-        # YOLO PREDICTION
-        # -------------------------------------------------
+        # -----------------------------------------------
+        # YOLO prediction
+        # -----------------------------------------------
 
         results = model.predict(
             source=image_array,
@@ -203,433 +297,413 @@ if analyze:
 
         result = results[0]
 
-
-        # -------------------------------------------------
-        # DETECTION INFORMATION
-        # -------------------------------------------------
+        # -----------------------------------------------
+        # Count classes
+        # -----------------------------------------------
 
         crack_count = 0
         tear_count = 0
 
-        crack_confidences = []
-        tear_confidences = []
+        max_confidence = 0.0
 
+        if result.boxes is not None and len(result.boxes) > 0:
 
-        if result.boxes is not None:
+            classes = result.boxes.cls.cpu().numpy()
+            confidences = result.boxes.conf.cpu().numpy()
 
-            for box in result.boxes:
+            for cls, conf in zip(classes, confidences):
 
-                class_id = int(box.cls[0])
-                confidence = float(box.conf[0])
+                max_confidence = max(
+                    max_confidence,
+                    float(conf)
+                )
 
-                # Class 0 = Crack
-                if class_id == 0:
-
+                if int(cls) == 0:
                     crack_count += 1
-                    crack_confidences.append(confidence)
 
-                # Class 1 = Tear
-                elif class_id == 1:
-
+                elif int(cls) == 1:
                     tear_count += 1
-                    tear_confidences.append(confidence)
 
+        # -----------------------------------------------
+        # Risk score
+        # -----------------------------------------------
 
-        # -------------------------------------------------
-        # ANNOTATED IMAGE
-        # -------------------------------------------------
+        risk_score = 0
 
-        annotated_image = result.plot()
-
-        annotated_image = annotated_image[:, :, ::-1]
-
-
-        # =================================================
-        # SENSOR WARNINGS
-        # =================================================
-
-        vibration_warning = vibration > 7
-
-        temperature_warning = temperature > 70
-
-
-        # =================================================
-        # RISK SCORE
-        # =================================================
-
-        vibration_score = min(
-            (vibration / 10) * 40,
-            40
-        )
-
-        temperature_score = min(
-            (temperature / 80) * 30,
-            30
-        )
-
-        visual_score = 0
-
+        # Visual damage
         if crack_count > 0:
-            visual_score += 15
+            risk_score += 35
 
         if tear_count > 0:
-            visual_score += 15
+            risk_score += 35
 
+        # Vibration
+        if vibration > 7:
+            risk_score += 20
 
-        risk_score = (
-            vibration_score
-            + temperature_score
-            + visual_score
-        )
+        elif vibration > 5:
+            risk_score += 10
+
+        # Temperature
+        if temperature > 70:
+            risk_score += 20
+
+        elif temperature > 60:
+            risk_score += 10
 
         risk_score = min(risk_score, 100)
 
+        # -----------------------------------------------
+        # Risk level
+        # -----------------------------------------------
 
-        # =================================================
-        # RISK LEVEL
-        # =================================================
+        if risk_score >= 70:
+            risk_level = "HIGH"
+        elif risk_score >= 40:
+            risk_level = "MEDIUM"
+        else:
+            risk_level = "LOW"
 
-        if risk_score < 40:
+        # -----------------------------------------------
+        # Recommendation
+        # -----------------------------------------------
 
-            risk_level = "LOW RISK"
-            risk_class = "risk-low"
-            risk_icon = "🟢"
+        if risk_level == "HIGH":
 
-        elif risk_score < 70:
+            recommendation = (
+                "Stop or isolate the affected belt section "
+                "and perform immediate inspection."
+            )
 
-            risk_level = "MEDIUM RISK"
-            risk_class = "risk-medium"
-            risk_icon = "🟠"
+        elif risk_level == "MEDIUM":
+
+            recommendation = (
+                "Schedule inspection and continue close monitoring."
+            )
 
         else:
 
-            risk_level = "HIGH RISK"
-            risk_class = "risk-high"
-            risk_icon = "🔴"
+            recommendation = (
+                "Continue normal monitoring."
+            )
 
+        # -----------------------------------------------
+        # Save inspection
+        # -----------------------------------------------
+
+        timestamp = datetime.now().strftime(
+            "%d %b %Y, %I:%M %p"
+        )
+
+        inspection = {
+            "Time": timestamp,
+            "Crack": crack_count,
+            "Tear": tear_count,
+            "Vibration": vibration,
+            "Temperature": temperature,
+            "Risk Score": risk_score,
+            "Status": risk_level
+        }
+
+        st.session_state.inspection_history.append(
+            inspection
+        )
 
         # =================================================
-        # CURRENT SNAPSHOT + STATUS
+        # MAIN DASHBOARD
         # =================================================
 
         st.divider()
 
-        left, right = st.columns([1, 1.2])
+        # -----------------------------------------------
+        # SNAPSHOT + STATUS
+        # -----------------------------------------------
 
+        col1, col2 = st.columns([1.5, 1])
 
-        # =================================================
-        # LEFT SIDE
-        # =================================================
+        # ===============================================
+        # CURRENT SNAPSHOT
+        # ===============================================
 
-        with left:
+        with col1:
+
+            st.markdown(
+                '<div class="card">',
+                unsafe_allow_html=True
+            )
 
             st.subheader("📷 CURRENT BELT SNAPSHOT")
+
+            annotated_image = result.plot()
+
+            # YOLO plot returns BGR
+            annotated_image = annotated_image[:, :, ::-1]
 
             st.image(
                 annotated_image,
                 use_container_width=True
             )
 
-
-        # =================================================
-        # RIGHT SIDE
-        # =================================================
-
-        with right:
-
-            st.subheader("📊 CURRENT STATUS")
-
-
-            col1, col2 = st.columns(2)
-
-
-            with col1:
-
-                st.metric(
-                    "📳 Vibration",
-                    f"{vibration:.1f} mm/s"
-                )
-
-                st.metric(
-                    "🌡️ Temperature",
-                    f"{temperature:.1f} °C"
-                )
-
-
-            with col2:
-
-                if crack_count > 0:
-
-                    st.error(
-                        f"Crack: DETECTED ({crack_count})"
-                    )
-
-                else:
-
-                    st.success(
-                        "Crack: NOT DETECTED"
-                    )
-
-
-                if tear_count > 0:
-
-                    st.error(
-                        f"Tear: DETECTED ({tear_count})"
-                    )
-
-                else:
-
-                    st.success(
-                        "Tear: NOT DETECTED"
-                    )
-
-
-            # -------------------------------------------------
-            # CONFIDENCE
-            # -------------------------------------------------
-
-            if crack_confidences:
-
-                crack_confidence = (
-                    max(crack_confidences) * 100
-                )
-
-                st.write(
-                    f"**Crack Confidence:** "
-                    f"{crack_confidence:.1f}%"
-                )
-
-
-            if tear_confidences:
-
-                tear_confidence = (
-                    max(tear_confidences) * 100
-                )
-
-                st.write(
-                    f"**Tear Confidence:** "
-                    f"{tear_confidence:.1f}%"
-                )
-
-
-            # -------------------------------------------------
-            # RISK
-            # -------------------------------------------------
-
-            st.metric(
-                "⚠️ Risk Score",
-                f"{risk_score:.0f}%"
-            )
-
             st.markdown(
-                f'<div class="{risk_class}">'
-                f'{risk_icon} {risk_level}'
+                f'<div class="small-text">'
+                f'Inspection captured: {timestamp}'
                 f'</div>',
                 unsafe_allow_html=True
             )
 
+            st.markdown("</div>", unsafe_allow_html=True)
 
-        # =================================================
-        # WARNINGS
-        # =================================================
+        # ===============================================
+        # CURRENT STATUS
+        # ===============================================
 
-        st.divider()
+        with col2:
 
-        st.subheader("⚠️ CONDITION ANALYSIS")
-
-
-        if crack_count > 0:
-
-            st.warning(
-                f"🔴 Crack detected by AI "
-                f"({crack_count} detection(s))."
+            st.markdown(
+                '<div class="card">',
+                unsafe_allow_html=True
             )
 
+            st.subheader("📊 CURRENT STATUS")
 
-        if tear_count > 0:
-
-            st.warning(
-                f"🔴 Tear detected by AI "
-                f"({tear_count} detection(s))."
-            )
-
-
-        if vibration_warning:
-
-            st.warning(
-                f"📳 High vibration detected: "
+            # Vibration
+            st.metric(
+                "📳 Vibration",
                 f"{vibration:.1f} mm/s"
             )
 
-        else:
-
-            st.success(
-                f"📳 Vibration normal: "
-                f"{vibration:.1f} mm/s"
-            )
-
-
-        if temperature_warning:
-
-            st.warning(
-                f"🌡️ High temperature detected: "
+            # Temperature
+            st.metric(
+                "🌡️ Temperature",
                 f"{temperature:.1f} °C"
             )
 
-        else:
+            # Crack
+            if crack_count > 0:
 
-            st.success(
-                f"🌡️ Temperature normal: "
-                f"{temperature:.1f} °C"
+                st.error(
+                    f"🔴 Crack: DETECTED ({crack_count})"
+                )
+
+            else:
+
+                st.success(
+                    "🟢 Crack: NOT DETECTED"
+                )
+
+            # Tear
+            if tear_count > 0:
+
+                st.error(
+                    f"🔴 Tear: DETECTED ({tear_count})"
+                )
+
+            else:
+
+                st.success(
+                    "🟢 Tear: NOT DETECTED"
+                )
+
+            # Confidence
+            if max_confidence > 0:
+
+                st.write(
+                    f"**AI Confidence:** "
+                    f"{max_confidence * 100:.1f}%"
+                )
+
+            # Risk score
+            st.metric(
+                "⚠️ Risk Score",
+                f"{risk_score}%"
             )
+
+            if risk_level == "LOW":
+
+                st.markdown(
+                    '<div class="risk-low">'
+                    '🟢 LOW RISK'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+            elif risk_level == "MEDIUM":
+
+                st.markdown(
+                    '<div class="risk-medium">'
+                    '🟡 MEDIUM RISK'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+            else:
+
+                st.markdown(
+                    '<div class="risk-high">'
+                    '🔴 HIGH RISK'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+            st.markdown("</div>", unsafe_allow_html=True)
 
 
         # =================================================
         # RECOMMENDATION
         # =================================================
 
-        st.divider()
+        st.markdown("### 🔧 RECOMMENDATION")
 
-        if risk_score >= 70:
+        if risk_level == "HIGH":
 
-            st.error(
-                "🔧 **RECOMMENDATION:** "
-                "Immediate inspection recommended. "
-                "Possible belt deterioration detected."
-            )
+            st.error(recommendation)
 
-        elif risk_score >= 40:
+        elif risk_level == "MEDIUM":
 
-            st.warning(
-                "🔧 **RECOMMENDATION:** "
-                "Schedule detailed inspection and "
-                "continue monitoring."
-            )
+            st.warning(recommendation)
 
         else:
 
-            st.success(
-                "🔧 **RECOMMENDATION:** "
-                "Continue normal monitoring."
-            )
+            st.success(recommendation)
 
 
         # =================================================
-        # INSPECTION HISTORY
+        # ALERTS
         # =================================================
 
         st.divider()
 
-        st.subheader("📈 INSPECTION HISTORY")
+        alert_col1, alert_col2 = st.columns([1, 1])
+
+        with alert_col1:
+
+            st.subheader("🔔 ALERTS & NOTIFICATIONS")
+
+            if risk_level == "HIGH":
+
+                st.markdown(
+                    '<div class="alert-box">'
+                    '<b>🚨 BELT DAMAGE ALERT</b><br>'
+                    f'High-risk condition detected at {timestamp}.'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+                st.warning(
+                    "📱 Phone notification triggered "
+                    "(prototype simulation)."
+                )
+
+            elif risk_level == "MEDIUM":
+
+                st.markdown(
+                    '<div class="alert-box">'
+                    '<b>⚠️ MONITORING ALERT</b><br>'
+                    'Moderate belt risk detected.'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+            else:
+
+                st.markdown(
+                    '<div class="normal-box">'
+                    '✅ No active belt damage alert.'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+        # ===============================================
+        # PHONE NOTIFICATION
+        # ===============================================
+
+        with alert_col2:
+
+            st.subheader("📱 PHONE NOTIFICATION")
+
+            if risk_level == "HIGH":
+
+                st.markdown(
+                    '<div class="card">'
+                    '<h4>🚨 Belt Damage Alert</h4>'
+                    '<p>High-risk belt condition detected.</p>'
+                    f'<p class="small-text">{timestamp}</p>'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+            else:
+
+                st.markdown(
+                    '<div class="card">'
+                    '<h4>📱 Monitoring Active</h4>'
+                    '<p>No critical alert currently active.</p>'
+                    '</div>',
+                    unsafe_allow_html=True
+                )
 
 
-        history = pd.DataFrame({
+# =========================================================
+# INSPECTION HISTORY
+# =========================================================
 
-            "Inspection": [
-                1, 2, 3, 4, 5, 6
-            ],
+st.divider()
 
-            "Vibration": [
-                4.2, 4.8, 5.7, 6.8, 8.1, 8.7
-            ],
+st.subheader("📋 INSPECTION LOG")
 
-            "Temperature": [
-                39, 42, 47, 55, 64, 71
-            ],
+if len(st.session_state.inspection_history) == 0:
 
-            "Risk Score": [
-                29, 32, 39, 56, 73, 82
-            ]
-        })
+    st.info(
+        "No inspections recorded yet. "
+        "Upload an image and click ANALYZE BELT."
+    )
 
+else:
 
-        tab1, tab2, tab3 = st.tabs([
-            "📳 Vibration",
-            "🌡️ Temperature",
-            "⚠️ Risk Score"
-        ])
+    history_df = pd.DataFrame(
+        st.session_state.inspection_history
+    )
 
-
-        with tab1:
-
-            st.line_chart(
-                history.set_index("Inspection")[
-                    "Vibration"
-                ]
-            )
+    st.dataframe(
+        history_df,
+        use_container_width=True,
+        hide_index=True
+    )
 
 
-        with tab2:
+# =========================================================
+# DAMAGE TREND
+# =========================================================
 
-            st.line_chart(
-                history.set_index("Inspection")[
-                    "Temperature"
-                ]
-            )
+st.subheader("📈 DAMAGE & RISK TREND")
 
+if len(st.session_state.inspection_history) >= 2:
 
-        with tab3:
+    chart_df = pd.DataFrame(
+        st.session_state.inspection_history
+    )
 
-            st.line_chart(
-                history.set_index("Inspection")[
-                    "Risk Score"
-                ]
-            )
+    chart_df = chart_df[
+        [
+            "Time",
+            "Crack",
+            "Tear",
+            "Risk Score"
+        ]
+    ]
 
+    chart_df = chart_df.set_index("Time")
 
-        # =================================================
-        # INSPECTION LOG
-        # =================================================
+    st.line_chart(
+        chart_df,
+        use_container_width=True
+    )
 
-        st.divider()
+else:
 
-        st.subheader("📋 INSPECTION LOG")
-
-
-        current_time = datetime.now().strftime(
-            "%H:%M:%S"
-        )
-
-
-        log = pd.DataFrame({
-
-            "Time": [current_time],
-
-            "Vibration": [
-                f"{vibration:.1f} mm/s"
-            ],
-
-            "Temperature": [
-                f"{temperature:.1f} °C"
-            ],
-
-            "Crack": [
-                "Detected"
-                if crack_count > 0
-                else "Not detected"
-            ],
-
-            "Tear": [
-                "Detected"
-                if tear_count > 0
-                else "Not detected"
-            ],
-
-            "Risk": [
-                f"{risk_score:.0f}%"
-            ],
-
-            "Status": [
-                risk_level
-            ]
-        })
-
-
-        st.dataframe(
-            log,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.info(
+        "Run at least two inspections to display the trend."
+    )
 
 
 # =========================================================
@@ -638,7 +712,10 @@ if analyze:
 
 st.divider()
 
-st.caption(
-    "Smart Belt Monitoring System | "
-    "AI visual inspection + vibration + temperature monitoring"
+st.markdown(
+    '<div style="text-align:center; color:#6b7280;">'
+    'Smart Belt Monitoring System | '
+    'AI visual inspection + vibration + temperature monitoring'
+    '</div>',
+    unsafe_allow_html=True
 )
