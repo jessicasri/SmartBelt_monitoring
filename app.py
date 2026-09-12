@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import requests
 
 
 # =========================================================
@@ -26,7 +27,6 @@ st.markdown(
     """
     <style>
 
-    /* Main page */
     .stApp {
         background-color: #07101e;
         color: white;
@@ -38,7 +38,6 @@ st.markdown(
         max-width: 1600px;
     }
 
-    /* Hide Streamlit default elements */
     #MainMenu {
         visibility: hidden;
     }
@@ -51,13 +50,11 @@ st.markdown(
         visibility: hidden;
     }
 
-    /* Sidebar */
     section[data-testid="stSidebar"] {
         background-color: #0b1424;
         border-right: 1px solid #1d2b40;
     }
 
-    /* Header */
     .top-header {
         background-color: #0c1627;
         border: 1px solid #1d2c43;
@@ -90,7 +87,6 @@ st.markdown(
         margin-top: 5px;
     }
 
-    /* Cards */
     .dashboard-card {
         background-color: #0d1829;
         border: 1px solid #1f3048;
@@ -106,7 +102,6 @@ st.markdown(
         margin-bottom: 12px;
     }
 
-    /* Empty live feed */
     .empty-feed {
         height: 270px;
         background-color: #091321;
@@ -119,7 +114,6 @@ st.markdown(
         font-size: 16px;
     }
 
-    /* Status */
     .status-normal {
         color: #42e58b;
         font-size: 27px;
@@ -138,7 +132,6 @@ st.markdown(
         font-weight: 700;
     }
 
-    /* Metric */
     .metric-box {
         background-color: #091321;
         border: 1px solid #263650;
@@ -159,7 +152,6 @@ st.markdown(
         margin-top: 4px;
     }
 
-    /* Alerts */
     .alert-box {
         background-color: #251923;
         border: 1px solid #603140;
@@ -180,7 +172,6 @@ st.markdown(
         margin-top: 4px;
     }
 
-    /* Phone */
     .phone-box {
         background-color: #091321;
         border: 1px solid #263650;
@@ -212,7 +203,6 @@ st.markdown(
         font-size: 12px;
     }
 
-    /* Section title */
     .section-title {
         color: white;
         font-size: 21px;
@@ -221,7 +211,6 @@ st.markdown(
         margin-bottom: 10px;
     }
 
-    /* Buttons */
     .stButton > button {
         border-radius: 7px;
         font-weight: 650;
@@ -245,10 +234,65 @@ def load_model():
 try:
     model = load_model()
     model_loaded = True
+
 except Exception as error:
     model_loaded = False
     st.error("Could not load best.pt")
     st.code(str(error))
+
+
+# =========================================================
+# TELEGRAM ALERT FUNCTION
+# =========================================================
+
+def send_telegram_alert(
+    damage,
+    confidence,
+    vibration,
+    temperature,
+    risk_score,
+    status
+):
+
+    try:
+
+        bot_token = st.secrets["TELEGRAM_BOT_TOKEN"]
+        chat_id = st.secrets["TELEGRAM_CHAT_ID"]
+
+        message = f"""
+🚨 SMART BELT ALERT
+
+Conveyor belt damage detected.
+
+Status: {status}
+Damage: {damage}
+AI Confidence: {confidence:.1f}%
+
+📳 Vibration: {vibration:.1f} mm/s
+🌡️ Temperature: {temperature:.1f} °C
+⚠️ Risk Score: {risk_score}%
+
+Immediate inspection recommended.
+"""
+
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+
+        response = requests.post(
+            url,
+            json={
+                "chat_id": chat_id,
+                "text": message
+            },
+            timeout=10
+        )
+
+        if response.ok:
+            return True
+
+        return False
+
+    except Exception:
+        return False
 
 
 # =========================================================
@@ -263,6 +307,9 @@ if "alerts" not in st.session_state:
 
 if "latest" not in st.session_state:
     st.session_state.latest = None
+
+if "telegram_sent" not in st.session_state:
+    st.session_state.telegram_sent = False
 
 
 # =========================================================
@@ -323,14 +370,27 @@ st.markdown(
     f"""
     <div class="top-header">
         <div style="display:flex; justify-content:space-between; align-items:center;">
+
             <div>
-                <div class="main-title">🏭 SMART BELT MONITORING SYSTEM</div>
-                <div class="sub-title">Intelligent monitoring of conveyor belt damage</div>
+                <div class="main-title">
+                    🏭 SMART BELT MONITORING SYSTEM
+                </div>
+
+                <div class="sub-title">
+                    Intelligent monitoring of conveyor belt damage
+                </div>
             </div>
+
             <div style="text-align:right;">
-                <div class="online-text">🟢 System Online</div>
-                <div class="date-text">{current_time}</div>
+                <div class="online-text">
+                    🟢 System Online
+                </div>
+
+                <div class="date-text">
+                    {current_time}
+                </div>
             </div>
+
         </div>
     </div>
     """,
@@ -357,9 +417,13 @@ with left_col:
     st.markdown(
         """
         <div class="dashboard-card">
+
             <div class="card-heading">
                 📹 Live Feed
-                <span style="float:right;color:#36df82;">● Live</span>
+
+                <span style="float:right;color:#36df82;">
+                    ● Live
+                </span>
             </div>
         """,
         unsafe_allow_html=True
@@ -410,6 +474,9 @@ with left_col:
 
 if analyze_button:
 
+    # Reset Telegram lock for this new inspection
+    st.session_state.telegram_sent = False
+
     if uploaded_file is None:
 
         st.warning(
@@ -431,6 +498,10 @@ if analyze_button:
         image_array = np.array(
             original_image
         )
+
+        # =================================================
+        # YOLO PREDICTION
+        # =================================================
 
         predictions = model.predict(
             source=image_array,
@@ -539,16 +610,27 @@ if analyze_button:
         )
 
         inspection = {
+
             "Time": inspection_time,
+
             "Damage": damage_text,
+
             "Crack": crack_count,
+
             "Tear": tear_count,
+
             "Vibration": vibration,
+
             "Temperature": temperature,
+
             "Risk": risk_score,
+
             "Status": belt_status,
+
             "Confidence": confidence,
+
             "Image": original_image
+
         }
 
         st.session_state.history.append(
@@ -558,21 +640,54 @@ if analyze_button:
         st.session_state.latest = inspection
 
         # =================================================
-        # SAVE ALERT
+        # SAVE LOCAL ALERT
         # =================================================
 
         if belt_status != "NORMAL":
 
             alert = {
+
                 "Time": inspection_time,
+
                 "Damage": damage_text,
+
                 "Risk": risk_score
+
             }
 
             st.session_state.alerts.insert(
                 0,
                 alert
             )
+
+        # =================================================
+        # SEND TELEGRAM ALERT
+        # =================================================
+
+        if belt_status != "NORMAL":
+
+            telegram_success = send_telegram_alert(
+                damage=damage_text,
+                confidence=confidence * 100,
+                vibration=vibration,
+                temperature=temperature,
+                risk_score=risk_score,
+                status=belt_status
+            )
+
+            if telegram_success:
+
+                st.session_state.telegram_sent = True
+
+                st.success(
+                    "📱 Telegram alert sent to your phone."
+                )
+
+            else:
+
+                st.warning(
+                    "⚠️ Damage detected, but Telegram alert could not be sent."
+                )
 
 
 # =========================================================
@@ -591,7 +706,10 @@ with middle_col:
     st.markdown(
         """
         <div class="dashboard-card">
-            <div class="card-heading">🛡️ Belt Status</div>
+
+            <div class="card-heading">
+                🛡️ Belt Status
+            </div>
         """,
         unsafe_allow_html=True
     )
@@ -603,7 +721,9 @@ with middle_col:
             unsafe_allow_html=True
         )
 
-        st.write("No inspection performed yet.")
+        st.write(
+            "No inspection performed yet."
+        )
 
         crack_value = 0
         tear_value = 0
@@ -612,25 +732,37 @@ with middle_col:
     else:
 
         if latest["Status"] == "CRITICAL":
+
             st.markdown(
                 '<div class="status-critical">🔴 CRITICAL</div>',
                 unsafe_allow_html=True
             )
-            st.write("Major belt damage detected.")
+
+            st.write(
+                "Major belt damage detected."
+            )
 
         elif latest["Status"] == "WARNING":
+
             st.markdown(
                 '<div class="status-warning">🟠 WARNING</div>',
                 unsafe_allow_html=True
             )
-            st.write("Potential belt deterioration detected.")
+
+            st.write(
+                "Potential belt deterioration detected."
+            )
 
         else:
+
             st.markdown(
                 '<div class="status-normal">🟢 NORMAL</div>',
                 unsafe_allow_html=True
             )
-            st.write("No major damage detected.")
+
+            st.write(
+                "No major damage detected."
+            )
 
         crack_value = latest["Crack"]
         tear_value = latest["Tear"]
@@ -638,26 +770,45 @@ with middle_col:
 
     st.divider()
 
-    # Crack and Tear
+    # =================================================
+    # CRACK AND TEAR
+    # =================================================
+
     metric1, metric2 = st.columns(2)
 
     with metric1:
+
         st.markdown(
             f"""
             <div class="metric-box">
-                <div class="metric-label">🔴 Crack</div>
-                <div class="metric-value">{crack_value}</div>
+
+                <div class="metric-label">
+                    🔴 Crack
+                </div>
+
+                <div class="metric-value">
+                    {crack_value}
+                </div>
+
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with metric2:
+
         st.markdown(
             f"""
             <div class="metric-box">
-                <div class="metric-label">🔵 Tear</div>
-                <div class="metric-value">{tear_value}</div>
+
+                <div class="metric-label">
+                    🔵 Tear
+                </div>
+
+                <div class="metric-value">
+                    {tear_value}
+                </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -665,26 +816,45 @@ with middle_col:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Placeholder categories
+    # =================================================
+    # PLACEHOLDER CATEGORIES
+    # =================================================
+
     metric3, metric4 = st.columns(2)
 
     with metric3:
+
         st.markdown(
             """
             <div class="metric-box">
-                <div class="metric-label">🟣 Belt Joint</div>
-                <div class="metric-value">0</div>
+
+                <div class="metric-label">
+                    🟣 Belt Joint
+                </div>
+
+                <div class="metric-value">
+                    0
+                </div>
+
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with metric4:
+
         st.markdown(
             """
             <div class="metric-box">
-                <div class="metric-label">🟡 Other Damage</div>
-                <div class="metric-value">0</div>
+
+                <div class="metric-label">
+                    🟡 Other Damage
+                </div>
+
+                <div class="metric-value">
+                    0
+                </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -695,8 +865,15 @@ with middle_col:
     st.markdown(
         f"""
         <div class="metric-box">
-            <div class="metric-label">⚠️ Risk Score</div>
-            <div class="metric-value">{risk_value}%</div>
+
+            <div class="metric-label">
+                ⚠️ Risk Score
+            </div>
+
+            <div class="metric-value">
+                {risk_value}%
+            </div>
+
         </div>
         """,
         unsafe_allow_html=True
@@ -705,6 +882,7 @@ with middle_col:
     st.markdown(
         """
         <br>
+
         <div class="small-text">
             🛡️ Monitoring system running 24/7
         </div>
@@ -724,7 +902,10 @@ with right_col:
     st.markdown(
         """
         <div class="dashboard-card">
-            <div class="card-heading">🔔 Alerts & Notifications</div>
+
+            <div class="card-heading">
+                🔔 Alerts & Notifications
+            </div>
         """,
         unsafe_allow_html=True
     )
@@ -736,12 +917,15 @@ with right_col:
             st.markdown(
                 f"""
                 <div class="alert-box">
+
                     <div class="alert-title">
                         🔴 {alert["Damage"]} Detected
                     </div>
+
                     <div class="alert-time">
                         {alert["Time"]}
                     </div>
+
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -751,10 +935,14 @@ with right_col:
 
         st.markdown(
             """
-            <div class="status-normal">🟢</div>
+            <div class="status-normal">
+                🟢
+            </div>
+
             <div style="font-size:15px; font-weight:600; margin-top:5px;">
                 No new alerts
             </div>
+
             <div class="small-text">
                 System is monitoring the conveyor belt.
             </div>
@@ -766,21 +954,44 @@ with right_col:
 
     st.markdown(
         """
-        <div class="card-heading">📱 Phone Notification</div>
+        <div class="card-heading">
+            📱 Phone Notification
+        </div>
+
         <div class="small-text">
             Get instant alerts on your phone for detected damage.
         </div>
+
         <br>
+
         <div class="phone-box">
-            <div class="phone-icon">📱</div>
-            <div class="phone-alert">
-                <div class="phone-alert-title">🔴 Belt Damage Alert</div>
-                <div class="small-text">Real-time notification</div>
+
+            <div class="phone-icon">
+                📱
             </div>
+
+            <div class="phone-alert">
+
+                <div class="phone-alert-title">
+                    🔴 Belt Damage Alert
+                </div>
+
+                <div class="small-text">
+                    Real-time Telegram notification
+                </div>
+
+            </div>
+
         </div>
         """,
         unsafe_allow_html=True
     )
+
+    if st.session_state.telegram_sent:
+
+        st.success(
+            "Telegram notification delivered."
+        )
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -825,7 +1036,9 @@ with log_column:
 
             with log1:
 
-                st.write(item["Time"])
+                st.write(
+                    item["Time"]
+                )
 
             with log2:
 
@@ -836,15 +1049,21 @@ with log_column:
 
             with log3:
 
-                st.write(f"**{item['Damage']}**")
+                st.write(
+                    f"**{item['Damage']}**"
+                )
 
                 if item["Status"] == "NORMAL":
 
-                    st.success("Normal")
+                    st.success(
+                        "Normal"
+                    )
 
                 else:
 
-                    st.error("⚠ Alert")
+                    st.error(
+                        "⚠ Alert"
+                    )
 
 
 # =========================================================
@@ -908,18 +1127,21 @@ st.markdown(
 sensor1, sensor2, sensor3 = st.columns(3)
 
 with sensor1:
+
     st.metric(
         "📳 Vibration",
         f"{vibration:.2f} mm/s"
     )
 
 with sensor2:
+
     st.metric(
         "🌡️ Temperature",
         f"{temperature:.1f} °C"
     )
 
 with sensor3:
+
     st.metric(
         "⚠️ Risk Score",
         f"{risk_value}%"
