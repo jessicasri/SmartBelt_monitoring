@@ -3,5 +3,5 @@ ultralytics==8.4.148
 pillow
 numpy==1.26.4
 pandas
-opencv-python-headless==4.10.0.84
+opencv-python-headless==4.11.0.86
 requests
