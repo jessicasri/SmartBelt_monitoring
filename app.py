@@ -3,8 +3,8 @@ from ultralytics import YOLO
 from PIL import Image
 import numpy as np
 import pandas as pd
-from datetime import datetime
 import requests
+from datetime import datetime
 
 
 # =========================================================
@@ -20,22 +20,24 @@ st.set_page_config(
 
 
 # =========================================================
-# CUSTOM STYLE
+# CUSTOM CSS
 # =========================================================
 
 st.markdown(
     """
     <style>
 
+    /* ---------- MAIN PAGE ---------- */
+
     .stApp {
-        background-color: #07101e;
+        background: #07101e;
         color: white;
     }
 
     .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
         max-width: 1600px;
+        padding-top: 1.2rem;
+        padding-bottom: 1rem;
     }
 
     #MainMenu {
@@ -50,23 +52,29 @@ st.markdown(
         visibility: hidden;
     }
 
+
+    /* ---------- SIDEBAR ---------- */
+
     section[data-testid="stSidebar"] {
-        background-color: #0b1424;
+        background: #0b1424;
         border-right: 1px solid #1d2b40;
     }
 
+
+    /* ---------- HEADER ---------- */
+
     .top-header {
-        background-color: #0c1627;
+        background: #0c1627;
         border: 1px solid #1d2c43;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 18px 24px;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
     }
 
     .main-title {
+        color: white;
         font-size: 27px;
         font-weight: 700;
-        color: white;
     }
 
     .sub-title {
@@ -78,7 +86,7 @@ st.markdown(
     .online-text {
         color: #36df82;
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .date-text {
@@ -87,57 +95,47 @@ st.markdown(
         margin-top: 5px;
     }
 
-    .dashboard-card {
-        background-color: #0d1829;
-        border: 1px solid #1f3048;
-        border-radius: 10px;
-        padding: 16px;
-        min-height: 100%;
+
+    /* ---------- SECTION TITLES ---------- */
+
+    .section-title {
+        color: white;
+        font-size: 20px;
+        font-weight: 700;
+        margin-top: 16px;
+        margin-bottom: 10px;
     }
 
-    .card-heading {
-        color: #dce7f6;
-        font-size: 18px;
-        font-weight: 650;
-        margin-bottom: 12px;
-    }
 
-    .empty-feed {
-        height: 270px;
-        background-color: #091321;
-        border: 1px solid #263650;
-        border-radius: 8px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #718096;
-        font-size: 16px;
-    }
+    /* ---------- STATUS ---------- */
 
     .status-normal {
         color: #42e58b;
-        font-size: 27px;
+        font-size: 26px;
         font-weight: 700;
     }
 
     .status-warning {
         color: #ffb83d;
-        font-size: 27px;
+        font-size: 26px;
         font-weight: 700;
     }
 
     .status-critical {
         color: #ff5757;
-        font-size: 27px;
+        font-size: 26px;
         font-weight: 700;
     }
 
-    .metric-box {
-        background-color: #091321;
+
+    /* ---------- METRIC CARDS ---------- */
+
+    .metric-card {
+        background: #091321;
         border: 1px solid #263650;
-        border-radius: 8px;
+        border-radius: 9px;
         padding: 12px;
-        min-height: 70px;
+        min-height: 72px;
     }
 
     .metric-label {
@@ -149,21 +147,24 @@ st.markdown(
         color: white;
         font-size: 23px;
         font-weight: 700;
-        margin-top: 4px;
+        margin-top: 5px;
     }
 
-    .alert-box {
-        background-color: #251923;
+
+    /* ---------- ALERT CARD ---------- */
+
+    .alert-card {
+        background: #251923;
         border: 1px solid #603140;
-        border-radius: 8px;
-        padding: 12px;
+        border-radius: 9px;
+        padding: 11px;
         margin-bottom: 8px;
     }
 
     .alert-title {
         color: #ff6262;
-        font-weight: 650;
         font-size: 14px;
+        font-weight: 700;
     }
 
     .alert-time {
@@ -172,48 +173,69 @@ st.markdown(
         margin-top: 4px;
     }
 
-    .phone-box {
-        background-color: #091321;
+
+    /* ---------- PHONE CARD ---------- */
+
+    .phone-card {
+        background: #091321;
         border: 1px solid #263650;
         border-radius: 9px;
-        padding: 15px;
+        padding: 14px;
         text-align: center;
     }
 
     .phone-icon {
-        font-size: 45px;
+        font-size: 42px;
     }
 
     .phone-alert {
-        background-color: #202b40;
+        background: #202b40;
         border-radius: 8px;
         padding: 10px;
-        text-align: left;
         margin-top: 10px;
+        text-align: left;
     }
 
     .phone-alert-title {
         color: #ff5c5c;
-        font-weight: 700;
         font-size: 13px;
+        font-weight: 700;
     }
+
+
+    /* ---------- SMALL TEXT ---------- */
 
     .small-text {
         color: #8391a5;
         font-size: 12px;
     }
 
-    .section-title {
-        color: white;
-        font-size: 21px;
-        font-weight: 700;
-        margin-top: 18px;
-        margin-bottom: 10px;
-    }
+
+    /* ---------- BUTTON ---------- */
 
     .stButton > button {
-        border-radius: 7px;
-        font-weight: 650;
+        border-radius: 8px;
+        font-weight: 700;
+        min-height: 42px;
+    }
+
+
+    /* ---------- FILE UPLOADER ---------- */
+
+    [data-testid="stFileUploader"] {
+        background: #091321;
+        border: 1px solid #263650;
+        border-radius: 8px;
+        padding: 8px;
+    }
+
+
+    /* ---------- NATIVE STREAMLIT CONTAINERS ---------- */
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background: #0d1829;
+        border-color: #1f3048;
+        border-radius: 10px;
     }
 
     </style>
@@ -223,26 +245,7 @@ st.markdown(
 
 
 # =========================================================
-# LOAD YOLO MODEL
-# =========================================================
-
-@st.cache_resource
-def load_model():
-    return YOLO("best.pt")
-
-
-try:
-    model = load_model()
-    model_loaded = True
-
-except Exception as error:
-    model_loaded = False
-    st.error("Could not load best.pt")
-    st.code(str(error))
-
-
-# =========================================================
-# TELEGRAM ALERT FUNCTION
+# TELEGRAM ALERT
 # =========================================================
 
 def send_telegram_alert(
@@ -275,7 +278,10 @@ AI Confidence: {confidence:.1f}%
 Immediate inspection recommended.
 """
 
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        url = (
+            f"https://api.telegram.org/"
+            f"bot{bot_token}/sendMessage"
+        )
 
         response = requests.post(
             url,
@@ -286,13 +292,33 @@ Immediate inspection recommended.
             timeout=10
         )
 
-        if response.ok:
-            return True
-
-        return False
+        return response.ok
 
     except Exception:
         return False
+
+
+# =========================================================
+# LOAD YOLO MODEL
+# =========================================================
+
+@st.cache_resource
+def load_model():
+
+    return YOLO("best.pt")
+
+
+try:
+
+    model = load_model()
+    model_loaded = True
+
+except Exception as error:
+
+    model_loaded = False
+
+    st.error("Could not load best.pt")
+    st.code(str(error))
 
 
 # =========================================================
@@ -359,17 +385,21 @@ with st.sidebar:
 
 
 # =========================================================
-# TOP HEADER
+# HEADER
 # =========================================================
 
 current_time = datetime.now().strftime(
-    "%b %d, %Y %I:%M %p"
+    "%b %d, %Y  %I:%M %p"
 )
 
 st.markdown(
     f"""
     <div class="top-header">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        ">
 
             <div>
                 <div class="main-title">
@@ -399,7 +429,7 @@ st.markdown(
 
 
 # =========================================================
-# MAIN THREE-COLUMN DASHBOARD
+# MAIN COLUMNS
 # =========================================================
 
 left_col, middle_col, right_col = st.columns(
@@ -409,62 +439,62 @@ left_col, middle_col, right_col = st.columns(
 
 
 # =========================================================
-# LEFT: LIVE FEED
+# LEFT COLUMN - LIVE FEED
 # =========================================================
 
 with left_col:
 
-    st.markdown(
-        """
-        <div class="dashboard-card">
-
-            <div class="card-heading">
-                📹 Live Feed
-
-                <span style="float:right;color:#36df82;">
-                    ● Live
-                </span>
-            </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    uploaded_file = st.file_uploader(
-        "Upload conveyor belt image",
-        type=["jpg", "jpeg", "png"],
-        label_visibility="collapsed"
-    )
-
-    if uploaded_file is None:
+    with st.container(border=True):
 
         st.markdown(
             """
-            <div class="empty-feed">
-                📷 Upload a conveyor belt image
+            <div class="card-heading"
+                 style="color:#dce7f6;
+                        font-size:18px;
+                        font-weight:700;
+                        margin-bottom:12px;">
+                📹 Live Feed
+                <span style="
+                    float:right;
+                    color:#36df82;
+                    font-size:13px;">
+                    ● Live
+                </span>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-    else:
-
-        original_image = Image.open(
-            uploaded_file
-        ).convert("RGB")
-
-        st.image(
-            original_image,
-            use_container_width=True
+        uploaded_file = st.file_uploader(
+            "Upload conveyor belt image",
+            type=["jpg", "jpeg", "png"],
+            label_visibility="collapsed"
         )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        if uploaded_file is None:
 
-    st.markdown("<br>", unsafe_allow_html=True)
+            st.info(
+                "📷 Upload a conveyor belt image to begin inspection."
+            )
+
+        else:
+
+            original_image = Image.open(
+                uploaded_file
+            ).convert("RGB")
+
+            st.image(
+                original_image,
+                width="stretch"
+            )
+
+
+    st.write("")
 
     analyze_button = st.button(
         "🔍 ANALYZE BELT",
         type="primary",
-        use_container_width=True
+        width="stretch"
     )
 
 
@@ -474,7 +504,6 @@ with left_col:
 
 if analyze_button:
 
-    # Reset Telegram lock for this new inspection
     st.session_state.telegram_sent = False
 
     if uploaded_file is None:
@@ -498,10 +527,6 @@ if analyze_button:
         image_array = np.array(
             original_image
         )
-
-        # =================================================
-        # YOLO PREDICTION
-        # =================================================
 
         predictions = model.predict(
             source=image_array,
@@ -534,6 +559,7 @@ if analyze_button:
                     result.boxes.conf.max()
                 )
 
+
         # =================================================
         # RISK SCORE
         # =================================================
@@ -563,6 +589,7 @@ if analyze_button:
             100
         )
 
+
         # =================================================
         # STATUS
         # =================================================
@@ -578,6 +605,7 @@ if analyze_button:
         else:
 
             belt_status = "NORMAL"
+
 
         # =================================================
         # DAMAGE NAME
@@ -600,6 +628,7 @@ if analyze_button:
         else:
 
             damage_text = "No visible damage"
+
 
         # =================================================
         # SAVE INSPECTION
@@ -630,7 +659,6 @@ if analyze_button:
             "Confidence": confidence,
 
             "Image": original_image
-
         }
 
         st.session_state.history.append(
@@ -639,8 +667,9 @@ if analyze_button:
 
         st.session_state.latest = inspection
 
+
         # =================================================
-        # SAVE LOCAL ALERT
+        # SAVE ALERT
         # =================================================
 
         if belt_status != "NORMAL":
@@ -652,7 +681,6 @@ if analyze_button:
                 "Damage": damage_text,
 
                 "Risk": risk_score
-
             }
 
             st.session_state.alerts.insert(
@@ -660,100 +688,62 @@ if analyze_button:
                 alert
             )
 
+
         # =================================================
-        # SEND TELEGRAM ALERT
+        # TELEGRAM ALERT
         # =================================================
 
         if belt_status != "NORMAL":
 
             telegram_success = send_telegram_alert(
-                damage=damage_text,
-                confidence=confidence * 100,
-                vibration=vibration,
-                temperature=temperature,
-                risk_score=risk_score,
-                status=belt_status
+                damage_text,
+                confidence * 100,
+                vibration,
+                temperature,
+                risk_score,
+                belt_status
             )
 
             if telegram_success:
 
                 st.session_state.telegram_sent = True
 
-                st.success(
-                    "📱 Telegram alert sent to your phone."
-                )
-
             else:
 
                 st.warning(
-                    "⚠️ Damage detected, but Telegram alert could not be sent."
+                    "Telegram notification could not be sent."
                 )
 
 
 # =========================================================
-# GET LATEST RESULT
+# LATEST RESULT
 # =========================================================
 
 latest = st.session_state.latest
 
 
 # =========================================================
-# MIDDLE: BELT STATUS
+# MIDDLE COLUMN - BELT STATUS
 # =========================================================
 
 with middle_col:
 
-    st.markdown(
-        """
-        <div class="dashboard-card">
-
-            <div class="card-heading">
-                🛡️ Belt Status
-            </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    if latest is None:
+    with st.container(border=True):
 
         st.markdown(
-            '<div class="status-normal">🟢 NORMAL</div>',
+            """
+            <div style="
+                color:#dce7f6;
+                font-size:18px;
+                font-weight:700;
+                margin-bottom:12px;">
+                🛡️ Belt Status
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
-        st.write(
-            "No inspection performed yet."
-        )
-
-        crack_value = 0
-        tear_value = 0
-        risk_value = 0
-
-    else:
-
-        if latest["Status"] == "CRITICAL":
-
-            st.markdown(
-                '<div class="status-critical">🔴 CRITICAL</div>',
-                unsafe_allow_html=True
-            )
-
-            st.write(
-                "Major belt damage detected."
-            )
-
-        elif latest["Status"] == "WARNING":
-
-            st.markdown(
-                '<div class="status-warning">🟠 WARNING</div>',
-                unsafe_allow_html=True
-            )
-
-            st.write(
-                "Potential belt deterioration detected."
-            )
-
-        else:
+        if latest is None:
 
             st.markdown(
                 '<div class="status-normal">🟢 NORMAL</div>',
@@ -761,244 +751,289 @@ with middle_col:
             )
 
             st.write(
-                "No major damage detected."
+                "No inspection performed yet."
             )
 
-        crack_value = latest["Crack"]
-        tear_value = latest["Tear"]
-        risk_value = latest["Risk"]
+            crack_value = 0
+            tear_value = 0
+            risk_value = 0
 
-    st.divider()
+        else:
 
-    # =================================================
-    # CRACK AND TEAR
-    # =================================================
+            if latest["Status"] == "CRITICAL":
 
-    metric1, metric2 = st.columns(2)
+                st.markdown(
+                    '<div class="status-critical">🔴 CRITICAL</div>',
+                    unsafe_allow_html=True
+                )
 
-    with metric1:
+                st.write(
+                    "Major belt damage detected."
+                )
 
-        st.markdown(
-            f"""
-            <div class="metric-box">
+            elif latest["Status"] == "WARNING":
 
-                <div class="metric-label">
-                    🔴 Crack
-                </div>
+                st.markdown(
+                    '<div class="status-warning">🟠 WARNING</div>',
+                    unsafe_allow_html=True
+                )
 
-                <div class="metric-value">
-                    {crack_value}
-                </div>
+                st.write(
+                    "Potential belt deterioration detected."
+                )
 
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            else:
 
-    with metric2:
+                st.markdown(
+                    '<div class="status-normal">🟢 NORMAL</div>',
+                    unsafe_allow_html=True
+                )
 
-        st.markdown(
-            f"""
-            <div class="metric-box">
+                st.write(
+                    "No major damage detected."
+                )
 
-                <div class="metric-label">
-                    🔵 Tear
-                </div>
-
-                <div class="metric-value">
-                    {tear_value}
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # =================================================
-    # PLACEHOLDER CATEGORIES
-    # =================================================
-
-    metric3, metric4 = st.columns(2)
-
-    with metric3:
-
-        st.markdown(
-            """
-            <div class="metric-box">
-
-                <div class="metric-label">
-                    🟣 Belt Joint
-                </div>
-
-                <div class="metric-value">
-                    0
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    with metric4:
-
-        st.markdown(
-            """
-            <div class="metric-box">
-
-                <div class="metric-label">
-                    🟡 Other Damage
-                </div>
-
-                <div class="metric-value">
-                    0
-                </div>
-
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    st.markdown(
-        f"""
-        <div class="metric-box">
-
-            <div class="metric-label">
-                ⚠️ Risk Score
-            </div>
-
-            <div class="metric-value">
-                {risk_value}%
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        """
-        <br>
-
-        <div class="small-text">
-            🛡️ Monitoring system running 24/7
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown("</div>", unsafe_allow_html=True)
+            crack_value = latest["Crack"]
+            tear_value = latest["Tear"]
+            risk_value = latest["Risk"]
 
 
-# =========================================================
-# RIGHT: ALERTS
-# =========================================================
+        st.divider()
 
-with right_col:
 
-    st.markdown(
-        """
-        <div class="dashboard-card">
+        # CRACK / TEAR
 
-            <div class="card-heading">
-                🔔 Alerts & Notifications
-            </div>
-        """,
-        unsafe_allow_html=True
-    )
+        metric1, metric2 = st.columns(2)
 
-    if st.session_state.alerts:
-
-        for alert in st.session_state.alerts[:3]:
+        with metric1:
 
             st.markdown(
                 f"""
-                <div class="alert-box">
-
-                    <div class="alert-title">
-                        🔴 {alert["Damage"]} Detected
+                <div class="metric-card">
+                    <div class="metric-label">
+                        🔴 Crack
                     </div>
-
-                    <div class="alert-time">
-                        {alert["Time"]}
+                    <div class="metric-value">
+                        {crack_value}
                     </div>
-
                 </div>
                 """,
                 unsafe_allow_html=True
             )
 
-    else:
+        with metric2:
+
+            st.markdown(
+                f"""
+                <div class="metric-card">
+                    <div class="metric-label">
+                        🔵 Tear
+                    </div>
+                    <div class="metric-value">
+                        {tear_value}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+
+        st.write("")
+
+
+        # PLACEHOLDER CATEGORIES
+
+        metric3, metric4 = st.columns(2)
+
+        with metric3:
+
+            st.markdown(
+                """
+                <div class="metric-card">
+                    <div class="metric-label">
+                        🟣 Belt Joint
+                    </div>
+                    <div class="metric-value">
+                        0
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+        with metric4:
+
+            st.markdown(
+                """
+                <div class="metric-card">
+                    <div class="metric-label">
+                        🟡 Other Damage
+                    </div>
+                    <div class="metric-value">
+                        0
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+
+        st.write("")
+
 
         st.markdown(
-            """
-            <div class="status-normal">
-                🟢
-            </div>
-
-            <div style="font-size:15px; font-weight:600; margin-top:5px;">
-                No new alerts
-            </div>
-
-            <div class="small-text">
-                System is monitoring the conveyor belt.
+            f"""
+            <div class="metric-card">
+                <div class="metric-label">
+                    ⚠️ Risk Score
+                </div>
+                <div class="metric-value">
+                    {risk_value}%
+                </div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-    st.divider()
+        st.write("")
 
-    st.markdown(
-        """
-        <div class="card-heading">
-            📱 Phone Notification
-        </div>
+        st.caption(
+            "🛡️ Monitoring system running 24/7"
+        )
 
-        <div class="small-text">
-            Get instant alerts on your phone for detected damage.
-        </div>
 
-        <br>
+# =========================================================
+# RIGHT COLUMN - ALERTS
+# =========================================================
 
-        <div class="phone-box">
+with right_col:
 
-            <div class="phone-icon">
-                📱
+    with st.container(border=True):
+
+        st.markdown(
+            """
+            <div style="
+                color:#dce7f6;
+                font-size:18px;
+                font-weight:700;
+                margin-bottom:12px;">
+                🔔 Alerts & Notifications
             </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-            <div class="phone-alert">
+        if st.session_state.alerts:
 
-                <div class="phone-alert-title">
-                    🔴 Belt Damage Alert
+            for alert in st.session_state.alerts[:3]:
+
+                st.markdown(
+                    f"""
+                    <div class="alert-card">
+
+                        <div class="alert-title">
+                            🔴 {alert["Damage"]} Detected
+                        </div>
+
+                        <div class="alert-time">
+                            {alert["Time"]}
+                        </div>
+
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+        else:
+
+            st.markdown(
+                """
+                <div class="status-normal">
+                    🟢
+                </div>
+
+                <div style="
+                    font-size:15px;
+                    font-weight:600;
+                    margin-top:5px;">
+                    No new alerts
                 </div>
 
                 <div class="small-text">
-                    Real-time Telegram notification
+                    System is monitoring the conveyor belt.
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+
+        st.divider()
+
+
+        st.markdown(
+            """
+            <div style="
+                color:#dce7f6;
+                font-size:17px;
+                font-weight:700;
+                margin-bottom:5px;">
+                📱 Phone Notification
+            </div>
+
+            <div class="small-text">
+                Get instant alerts on your phone
+                for detected damage.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+        st.write("")
+
+
+        st.markdown(
+            """
+            <div class="phone-card">
+
+                <div class="phone-icon">
+                    📱
+                </div>
+
+                <div class="phone-alert">
+
+                    <div class="phone-alert-title">
+                        🔴 Belt Damage Alert
+                    </div>
+
+                    <div class="small-text">
+                        Real-time notification
+                    </div>
+
                 </div>
 
             </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    if st.session_state.telegram_sent:
-
-        st.success(
-            "Telegram notification delivered."
+            """,
+            unsafe_allow_html=True
         )
 
-    st.markdown("</div>", unsafe_allow_html=True)
+
+        if st.session_state.telegram_sent:
+
+            st.success(
+                "Telegram alert sent to phone."
+            )
 
 
 # =========================================================
 # LOWER SECTION
 # =========================================================
+
+st.markdown(
+    '<div class="section-title">🕒 Inspection Log</div>',
+    unsafe_allow_html=True
+)
+
 
 log_column, trend_column = st.columns(
     [1.1, 0.9],
@@ -1011,11 +1046,6 @@ log_column, trend_column = st.columns(
 # =========================================================
 
 with log_column:
-
-    st.markdown(
-        '<div class="section-title">🕒 Inspection Log</div>',
-        unsafe_allow_html=True
-    )
 
     if not st.session_state.history:
 
@@ -1030,40 +1060,42 @@ with log_column:
             st.session_state.history[-5:]
         ):
 
-            log1, log2, log3 = st.columns(
-                [1.2, 1.0, 1.5]
-            )
+            with st.container(border=True):
 
-            with log1:
-
-                st.write(
-                    item["Time"]
+                log1, log2, log3 = st.columns(
+                    [1.2, 1.0, 1.5]
                 )
 
-            with log2:
+                with log1:
 
-                st.image(
-                    item["Image"],
-                    width=80
-                )
-
-            with log3:
-
-                st.write(
-                    f"**{item['Damage']}**"
-                )
-
-                if item["Status"] == "NORMAL":
-
-                    st.success(
-                        "Normal"
+                    st.write(
+                        item["Time"]
                     )
 
-                else:
+                with log2:
 
-                    st.error(
-                        "⚠ Alert"
+                    st.image(
+                        item["Image"],
+                        width=80
                     )
+
+                with log3:
+
+                    st.write(
+                        f"**{item['Damage']}**"
+                    )
+
+                    if item["Status"] == "NORMAL":
+
+                        st.success(
+                            "Normal"
+                        )
+
+                    else:
+
+                        st.error(
+                            "⚠ Alert"
+                        )
 
 
 # =========================================================
@@ -1111,7 +1143,7 @@ with trend_column:
 
         st.line_chart(
             chart_df,
-            use_container_width=True
+            width="stretch"
         )
 
 
