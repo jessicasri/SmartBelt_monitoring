@@ -322,37 +322,16 @@ current_time = datetime.now().strftime(
 st.markdown(
     f"""
     <div class="top-header">
-
-        <div style="display:flex;
-                    justify-content:space-between;
-                    align-items:center;">
-
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-
-                <div class="main-title">
-                    🏭 SMART BELT MONITORING SYSTEM
-                </div>
-
-                <div class="sub-title">
-                    Intelligent monitoring of conveyor belt damage
-                </div>
-
+                <div class="main-title">🏭 SMART BELT MONITORING SYSTEM</div>
+                <div class="sub-title">Intelligent monitoring of conveyor belt damage</div>
             </div>
-
             <div style="text-align:right;">
-
-                <div class="online-text">
-                    🟢 System Online
-                </div>
-
-                <div class="date-text">
-                    {current_time}
-                </div>
-
+                <div class="online-text">🟢 System Online</div>
+                <div class="date-text">{current_time}</div>
             </div>
-
         </div>
-
     </div>
     """,
     unsafe_allow_html=True
@@ -378,14 +357,10 @@ with left_col:
     st.markdown(
         """
         <div class="dashboard-card">
-
             <div class="card-heading">
                 📹 Live Feed
-                <span style="float:right;color:#36df82;">
-                    ● Live
-                </span>
+                <span style="float:right;color:#36df82;">● Live</span>
             </div>
-
         """,
         unsafe_allow_html=True
     )
@@ -418,10 +393,7 @@ with left_col:
             use_container_width=True
         )
 
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -619,10 +591,7 @@ with middle_col:
     st.markdown(
         """
         <div class="dashboard-card">
-
-            <div class="card-heading">
-                🛡️ Belt Status
-            </div>
+            <div class="card-heading">🛡️ Belt Status</div>
         """,
         unsafe_allow_html=True
     )
@@ -630,17 +599,11 @@ with middle_col:
     if latest is None:
 
         st.markdown(
-            """
-            <div class="status-normal">
-                🟢 NORMAL
-            </div>
-            """,
+            '<div class="status-normal">🟢 NORMAL</div>',
             unsafe_allow_html=True
         )
 
-        st.write(
-            "No inspection performed yet."
-        )
+        st.write("No inspection performed yet.")
 
         crack_value = 0
         tear_value = 0
@@ -649,49 +612,25 @@ with middle_col:
     else:
 
         if latest["Status"] == "CRITICAL":
-
             st.markdown(
-                """
-                <div class="status-critical">
-                    🔴 CRITICAL
-                </div>
-                """,
+                '<div class="status-critical">🔴 CRITICAL</div>',
                 unsafe_allow_html=True
             )
-
-            st.write(
-                "Major belt damage detected."
-            )
+            st.write("Major belt damage detected.")
 
         elif latest["Status"] == "WARNING":
-
             st.markdown(
-                """
-                <div class="status-warning">
-                    🟠 WARNING
-                </div>
-                """,
+                '<div class="status-warning">🟠 WARNING</div>',
                 unsafe_allow_html=True
             )
-
-            st.write(
-                "Potential belt deterioration detected."
-            )
+            st.write("Potential belt deterioration detected.")
 
         else:
-
             st.markdown(
-                """
-                <div class="status-normal">
-                    🟢 NORMAL
-                </div>
-                """,
+                '<div class="status-normal">🟢 NORMAL</div>',
                 unsafe_allow_html=True
             )
-
-            st.write(
-                "No major damage detected."
-            )
+            st.write("No major damage detected.")
 
         crack_value = latest["Crack"]
         tear_value = latest["Tear"]
@@ -700,42 +639,25 @@ with middle_col:
     st.divider()
 
     # Crack and Tear
-
     metric1, metric2 = st.columns(2)
 
     with metric1:
-
         st.markdown(
             f"""
             <div class="metric-box">
-
-                <div class="metric-label">
-                    🔴 Crack
-                </div>
-
-                <div class="metric-value">
-                    {crack_value}
-                </div>
-
+                <div class="metric-label">🔴 Crack</div>
+                <div class="metric-value">{crack_value}</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with metric2:
-
         st.markdown(
             f"""
             <div class="metric-box">
-
-                <div class="metric-label">
-                    🔵 Tear
-                </div>
-
-                <div class="metric-value">
-                    {tear_value}
-                </div>
-
+                <div class="metric-label">🔵 Tear</div>
+                <div class="metric-value">{tear_value}</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -744,42 +666,25 @@ with middle_col:
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Placeholder categories
-
     metric3, metric4 = st.columns(2)
 
     with metric3:
-
         st.markdown(
             """
             <div class="metric-box">
-
-                <div class="metric-label">
-                    🟣 Belt Joint
-                </div>
-
-                <div class="metric-value">
-                    0
-                </div>
-
+                <div class="metric-label">🟣 Belt Joint</div>
+                <div class="metric-value">0</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
     with metric4:
-
         st.markdown(
             """
             <div class="metric-box">
-
-                <div class="metric-label">
-                    🟡 Other Damage
-                </div>
-
-                <div class="metric-value">
-                    0
-                </div>
-
+                <div class="metric-label">🟡 Other Damage</div>
+                <div class="metric-value">0</div>
             </div>
             """,
             unsafe_allow_html=True
@@ -790,15 +695,8 @@ with middle_col:
     st.markdown(
         f"""
         <div class="metric-box">
-
-            <div class="metric-label">
-                ⚠️ Risk Score
-            </div>
-
-            <div class="metric-value">
-                {risk_value}%
-            </div>
-
+            <div class="metric-label">⚠️ Risk Score</div>
+            <div class="metric-value">{risk_value}%</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -807,7 +705,6 @@ with middle_col:
     st.markdown(
         """
         <br>
-
         <div class="small-text">
             🛡️ Monitoring system running 24/7
         </div>
@@ -815,10 +712,7 @@ with middle_col:
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # =========================================================
@@ -830,10 +724,7 @@ with right_col:
     st.markdown(
         """
         <div class="dashboard-card">
-
-            <div class="card-heading">
-                🔔 Alerts & Notifications
-            </div>
+            <div class="card-heading">🔔 Alerts & Notifications</div>
         """,
         unsafe_allow_html=True
     )
@@ -845,15 +736,12 @@ with right_col:
             st.markdown(
                 f"""
                 <div class="alert-box">
-
                     <div class="alert-title">
                         🔴 {alert["Damage"]} Detected
                     </div>
-
                     <div class="alert-time">
                         {alert["Time"]}
                     </div>
-
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -863,17 +751,10 @@ with right_col:
 
         st.markdown(
             """
-            <div class="status-normal">
-                🟢
-            </div>
-
-            <div style="
-                font-size:15px;
-                font-weight:600;
-                margin-top:5px;">
+            <div class="status-normal">🟢</div>
+            <div style="font-size:15px; font-weight:600; margin-top:5px;">
                 No new alerts
             </div>
-
             <div class="small-text">
                 System is monitoring the conveyor belt.
             </div>
@@ -885,44 +766,23 @@ with right_col:
 
     st.markdown(
         """
-        <div class="card-heading">
-            📱 Phone Notification
-        </div>
-
+        <div class="card-heading">📱 Phone Notification</div>
         <div class="small-text">
-            Get instant alerts on your phone
-            for detected damage.
+            Get instant alerts on your phone for detected damage.
         </div>
-
         <br>
-
         <div class="phone-box">
-
-            <div class="phone-icon">
-                📱
-            </div>
-
+            <div class="phone-icon">📱</div>
             <div class="phone-alert">
-
-                <div class="phone-alert-title">
-                    🔴 Belt Damage Alert
-                </div>
-
-                <div class="small-text">
-                    Real-time notification
-                </div>
-
+                <div class="phone-alert-title">🔴 Belt Damage Alert</div>
+                <div class="small-text">Real-time notification</div>
             </div>
-
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 # =========================================================
@@ -965,9 +825,7 @@ with log_column:
 
             with log1:
 
-                st.write(
-                    item["Time"]
-                )
+                st.write(item["Time"])
 
             with log2:
 
@@ -978,21 +836,15 @@ with log_column:
 
             with log3:
 
-                st.write(
-                    f"**{item['Damage']}**"
-                )
+                st.write(f"**{item['Damage']}**")
 
                 if item["Status"] == "NORMAL":
 
-                    st.success(
-                        "Normal"
-                    )
+                    st.success("Normal")
 
                 else:
 
-                    st.error(
-                        "⚠ Alert"
-                    )
+                    st.error("⚠ Alert")
 
 
 # =========================================================
@@ -1056,21 +908,18 @@ st.markdown(
 sensor1, sensor2, sensor3 = st.columns(3)
 
 with sensor1:
-
     st.metric(
         "📳 Vibration",
         f"{vibration:.2f} mm/s"
     )
 
 with sensor2:
-
     st.metric(
         "🌡️ Temperature",
         f"{temperature:.1f} °C"
     )
 
 with sensor3:
-
     st.metric(
         "⚠️ Risk Score",
         f"{risk_value}%"
